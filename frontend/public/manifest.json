@@ -1,0 +1,11 @@
+{
+  "manifest_version": 3,
+  "name": "PassAssigner",
+  "version": "1.0",
+  "action": {
+    "default_popup": "index.html",
+    "default_title": "Open Popup"
+  },
+  "permissions": ["storage", "activeTab", "scripting"],
+  "host_permissions": ["http://127.0.0.1:8000/*"]
+}
