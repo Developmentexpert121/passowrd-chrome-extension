@@ -4,8 +4,10 @@ from .views import (
     AppUserDetailView,
     AppUserView,
     LoginView,
+    MeView,
     SignupView,
     ForgetPasswordView,
+    TokenRefreshView,
     CredentialViewSet,
     AssignmentViewSet,
 )
@@ -13,17 +15,18 @@ from .views import (
 router = DefaultRouter()
 router.register("credentials", CredentialViewSet, basename="credentials")
 router.register("assignments", AssignmentViewSet, basename="assignments")
+router.register("users", AppUserView, basename="users")
 
 urlpatterns = [
     path("login/", LoginView.as_view(), name="login"),
     # 👇 new user endpoints
-    path("users/", AppUserView.as_view(), name="users"),
-    path("users/<int:pk>/", AppUserDetailView.as_view(), name="user-detail"),
     path("signup/", SignupView.as_view(), name="signup"),
     path(
         "forget-password/<int:pk>/",
         ForgetPasswordView.as_view(),
         name="forget-password",
     ),
+    path("me/", MeView.as_view(), name="me"),
+    path("token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path("", include(router.urls)),
 ]

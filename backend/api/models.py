@@ -35,8 +35,8 @@ class AppUser(models.Model):
         return False
 
     def save(self, *args, **kwargs):
-        # Hash password before saving
-        if not self.pk or "password" in self.get_dirty_fields():
+        # Hash password before saving if it's not already hashed
+        if self.password and not self.password.startswith('pbkdf2_sha256$'):
             self.password = make_password(self.password)
         super().save(*args, **kwargs)
 
