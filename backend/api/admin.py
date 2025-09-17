@@ -1,7 +1,7 @@
 from django.contrib import admin
-from .models import User, Credential, Assignment
+from .models import AppUser, Credential, Assignment
 
 # Register your models here.
-admin.site.register(User)
+admin.site.register(AppUser)
 admin.site.register(Credential)
 admin.site.register(Assignment)
