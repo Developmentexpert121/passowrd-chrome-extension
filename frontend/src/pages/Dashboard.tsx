@@ -7,7 +7,7 @@ import ManageUsersTab from "./ManageUsersTab";
 import { clearStorage } from "../utils/api";
 
 interface DashboardProps {
-  user: { id: number; role: "super_admin" | "admin" | "user"; team?: string };
+  user: { id: number; role: "super_admin" | "admin" | "user"; team?: string; email: string };
   onLogout: () => void;
 }
 
@@ -36,7 +36,7 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
     <div className="bg-gray-50 p-4 w-96 min-h-screen text-gray-900">
       <div className="flex justify-between items-center mb-4">
         <h3 className="font-semibold text-xl">
-          Dashboard (Role: {user.role}, ID: {user.id})
+          {user.email}
         </h3>
         <button
           onClick={handleLogout}
@@ -49,11 +49,10 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
         {tabs.map((t) => (
           <button
             key={t.key}
-            className={`px-4 py-2 border-r border-gray-300 last:border-r-0 transition-colors ${
-              activeTab === t.key
-                ? "bg-primary-500 text-white border-b-0"
-                : "bg-gray-100 hover:bg-gray-200"
-            }`}
+            className={`px-4 py-2 border-r border-gray-300 last:border-r-0 transition-colors ${activeTab === t.key
+              ? "bg-primary-500 text-white border-b-0"
+              : "bg-gray-100 hover:bg-gray-200"
+              }`}
             onClick={() => setActiveTab(t.key)}
           >
             {t.label}
@@ -62,7 +61,7 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
       </div>
       <div className="bg-white shadow-sm p-4 rounded-md">
         {activeTab === "credentials" && <CredentialsTab user={user} />}
-        {activeTab === "admins" && <AdminsTab />}
+        {activeTab === "admins" && <AdminsTab user={user} />}
         {activeTab === "users" && <UsersTab user={user} />}
         {activeTab === "manageusers" && <ManageUsersTab />}
       </div>

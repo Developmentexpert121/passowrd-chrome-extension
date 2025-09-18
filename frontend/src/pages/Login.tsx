@@ -5,6 +5,7 @@ interface LoginProps {
   onLogin: (user: {
     id: number;
     role: "user" | "super_admin" | "admin";
+    email: string;
   }) => void;
 }
 
@@ -17,7 +18,15 @@ export default function Login({ onLogin }: LoginProps) {
     e.preventDefault();
     const data: LoginResponse = await loginUser(email, password);
     if (data.access) {
-      onLogin({ id: data.id, role: data.role });
+      // Fetch full user info including email after login
+      const userInfoResponse = await fetch("http://127.0.0.1:8000/api/me/", {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${data.access}`,
+        },
+      });
+      const userInfo = await userInfoResponse.json();
+      onLogin({ id: data.id, role: data.role, email: userInfo.email });
     } else {
       setError(data.error || "Login failed");
     }

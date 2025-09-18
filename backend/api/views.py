@@ -177,6 +177,24 @@ class CredentialViewSet(viewsets.ModelViewSet):
         # Fallback: if it's a default Django User, return nothing or restrict
         return Credential.objects.none()
 
+    def perform_create(self, serializer):
+        if self.request.user.role != "super_admin":
+            from rest_framework.exceptions import PermissionDenied
+            raise PermissionDenied("Only super admin can create credentials")
+        serializer.save()
+
+    def perform_update(self, serializer):
+        if self.request.user.role != "super_admin":
+            from rest_framework.exceptions import PermissionDenied
+            raise PermissionDenied("Only super admin can update credentials")
+        serializer.save()
+
+    def perform_destroy(self, instance):
+        if self.request.user.role != "super_admin":
+            from rest_framework.exceptions import PermissionDenied
+            raise PermissionDenied("Only super admin can delete credentials")
+        instance.delete()
+
 
 # ---------------- ASSIGNMENT VIEWS ----------------
 

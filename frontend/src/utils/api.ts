@@ -28,21 +28,21 @@ const storage =
   typeof chrome !== "undefined" && chrome.storage
     ? chrome.storage.local
     : {
-        get: (keys: string[], cb: (items: any) => void) => {
-          const result: any = {};
-          keys.forEach((k) => {
-            const value = localStorage.getItem(k);
-            result[k] = value ? JSON.parse(value) : null;
-          });
-          cb(result);
-        },
-        set: (items: any, cb?: () => void) => {
-          Object.keys(items).forEach((k) => {
-            localStorage.setItem(k, JSON.stringify(items[k]));
-          });
-          if (cb) cb();
-        },
-      };
+      get: (keys: string[], cb: (items: any) => void) => {
+        const result: any = {};
+        keys.forEach((k) => {
+          const value = localStorage.getItem(k);
+          result[k] = value ? JSON.parse(value) : null;
+        });
+        cb(result);
+      },
+      set: (items: any, cb?: () => void) => {
+        Object.keys(items).forEach((k) => {
+          localStorage.setItem(k, JSON.stringify(items[k]));
+        });
+        if (cb) cb();
+      },
+    };
 
 // ---------------- LOGIN ----------------
 export const loginUser = async (
@@ -161,10 +161,21 @@ export const addCredential = (credentialData: CredentialData) =>
     method: "POST",
     body: JSON.stringify(credentialData),
   });
+export const deleteCredential = (credentialId: number) =>
+  fetchWithToken<{ message?: string; error?: string }>(`/credentials/${credentialId}/`, {
+    method: "DELETE",
+  });
+export const updateCredential = (credentialId: number, credentialData: Partial<CredentialData>) =>
+  fetchWithToken<{ message?: string; error?: string }>(`/credentials/${credentialId}/`, {
+    method: "PATCH",
+    body: JSON.stringify(credentialData),
+  });
 
 // Assignment management
 export const fetchUsersForCredential = (credentialId: number) =>
   fetchWithToken<any[]>(`/assignments/${credentialId}/users_for_credential/`);
+export const fetchCredentialsForUser = (userId: number) =>
+  fetchWithToken<any[]>(`/assignments/${userId}/credentials_for_user/`);
 export const addUserAccessToCredential = (
   credentialId: number,
   userId: number
@@ -192,7 +203,7 @@ export const removeUserAccessFromCredential = (
 export const clearStorage = () =>
   new Promise<void>((resolve) =>
     storage.set(
-      { accessToken: null, refreshToken: null, userRole: null, userId: null },
+      { accessToken: null, refreshToken: null, userRole: null, userId: null, userEmail: null },
       () => resolve()
     )
   );
@@ -229,6 +240,7 @@ export const refreshToken = async (): Promise<LoginResponse | null> => {
 export const verifyUser = async (): Promise<{
   id: number;
   role: "super_admin" | "admin" | "user";
+  email: string;
 } | null> => {
   return new Promise((resolve) => {
     storage.get(["accessToken"], async ({ accessToken }) => {
@@ -263,7 +275,9 @@ export const verifyUser = async (): Promise<{
         return;
       }
       const userData = await res.json();
-      resolve({ id: userData.id, role: userData.role });
+      // Store userEmail
+      storage.set({ userEmail: userData.email }, () => { });
+      resolve({ id: userData.id, role: userData.role, email: userData.email });
     });
   });
 };

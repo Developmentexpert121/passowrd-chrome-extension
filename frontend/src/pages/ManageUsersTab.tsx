@@ -162,7 +162,7 @@ export default function ManageUsersTab() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 text-gray-50">
       <div className="flex gap-2">
         <button
           onClick={exportCSV}
@@ -228,11 +228,10 @@ export default function ManageUsersTab() {
         </button>
         {message && (
           <p
-            className={`text-sm ${
-              message.includes("success") || message.includes("User")
-                ? "text-green-600 dark:text-green-400"
-                : "text-red-600 dark:text-red-400"
-            }`}
+            className={`text-sm ${message.includes("success") || message.includes("User")
+              ? "text-green-600 dark:text-green-400"
+              : "text-red-600 dark:text-red-400"
+              }`}
           >
             {message}
           </p>

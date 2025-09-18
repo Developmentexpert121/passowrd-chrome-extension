@@ -7,6 +7,7 @@ function App() {
   const [user, setUser] = useState<{
     id: number;
     role: "user" | "super_admin" | "admin";
+    email: string;
   } | null>(null);
   const [loading, setLoading] = useState(true);
 
