@@ -28,21 +28,21 @@ const storage =
   typeof chrome !== "undefined" && chrome.storage
     ? chrome.storage.local
     : {
-      get: (keys: string[], cb: (items: any) => void) => {
-        const result: any = {};
-        keys.forEach((k) => {
-          const value = localStorage.getItem(k);
-          result[k] = value ? JSON.parse(value) : null;
-        });
-        cb(result);
-      },
-      set: (items: any, cb?: () => void) => {
-        Object.keys(items).forEach((k) => {
-          localStorage.setItem(k, JSON.stringify(items[k]));
-        });
-        if (cb) cb();
-      },
-    };
+        get: (keys: string[], cb: (items: any) => void) => {
+          const result: any = {};
+          keys.forEach((k) => {
+            const value = localStorage.getItem(k);
+            result[k] = value ? JSON.parse(value) : null;
+          });
+          cb(result);
+        },
+        set: (items: any, cb?: () => void) => {
+          Object.keys(items).forEach((k) => {
+            localStorage.setItem(k, JSON.stringify(items[k]));
+          });
+          if (cb) cb();
+        },
+      };
 
 // ---------------- LOGIN ----------------
 export const loginUser = async (
@@ -146,30 +146,86 @@ export const fetchCredentials = () => fetchWithToken<any[]>("/credentials/");
 export const fetchUsers = () => fetchWithToken<any[]>("/users/");
 export const fetchAdmins = () => fetchWithToken<any[]>("/users/?role=admin");
 export const exportUsers = () => fetchWithToken<any[]>("/users/export_users/");
-export const signupUser = (userData: UserData) =>
-  fetchWithToken<{ message?: string; error?: string }>("/signup/", {
+export const signupUser = async (
+  userData: UserData
+): Promise<{
+  message?: string;
+  error?: string;
+  errors?: Record<string, string[]>;
+}> => {
+  const res = await fetch(`${BASE_URL}/signup/`, {
     method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: await getAuthHeader(),
+    },
     body: JSON.stringify(userData),
   });
-export const updateUser = (userId: number, userData: Partial<UserData>) =>
-  fetchWithToken<{ message?: string; error?: string }>(`/users/${userId}/`, {
+
+  const data = await res.json();
+
+  if (res.ok) {
+    return { message: data.message || "User created successfully" };
+  } else {
+    // Handle field-specific errors
+    if (data.email || data.password || data.role || data.team) {
+      return { errors: data };
+    }
+    return { error: data.error || data.detail || "Failed to create user" };
+  }
+};
+export const updateUser = async (
+  userId: number,
+  userData: Partial<UserData>
+): Promise<{
+  message?: string;
+  error?: string;
+  errors?: Record<string, string[]>;
+}> => {
+  const res = await fetch(`${BASE_URL}/users/${userId}/`, {
     method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: await getAuthHeader(),
+    },
     body: JSON.stringify(userData),
   });
+
+  const data = await res.json();
+
+  if (res.ok) {
+    return { message: data.message || "User updated successfully" };
+  } else {
+    // Handle field-specific errors
+    if (data.email || data.password || data.role || data.team) {
+      return { errors: data };
+    }
+    return { error: data.error || data.detail || "Failed to update user" };
+  }
+};
 export const addCredential = (credentialData: CredentialData) =>
   fetchWithToken<{ message?: string; error?: string }>("/credentials/", {
     method: "POST",
     body: JSON.stringify(credentialData),
   });
 export const deleteCredential = (credentialId: number) =>
-  fetchWithToken<{ message?: string; error?: string }>(`/credentials/${credentialId}/`, {
-    method: "DELETE",
-  });
-export const updateCredential = (credentialId: number, credentialData: Partial<CredentialData>) =>
-  fetchWithToken<{ message?: string; error?: string }>(`/credentials/${credentialId}/`, {
-    method: "PATCH",
-    body: JSON.stringify(credentialData),
-  });
+  fetchWithToken<{ message?: string; error?: string }>(
+    `/credentials/${credentialId}/`,
+    {
+      method: "DELETE",
+    }
+  );
+export const updateCredential = (
+  credentialId: number,
+  credentialData: Partial<CredentialData>
+) =>
+  fetchWithToken<{ message?: string; error?: string }>(
+    `/credentials/${credentialId}/`,
+    {
+      method: "PATCH",
+      body: JSON.stringify(credentialData),
+    }
+  );
 
 // Assignment management
 export const fetchUsersForCredential = (credentialId: number) =>
@@ -203,7 +259,13 @@ export const removeUserAccessFromCredential = (
 export const clearStorage = () =>
   new Promise<void>((resolve) =>
     storage.set(
-      { accessToken: null, refreshToken: null, userRole: null, userId: null, userEmail: null },
+      {
+        accessToken: null,
+        refreshToken: null,
+        userRole: null,
+        userId: null,
+        userEmail: null,
+      },
       () => resolve()
     )
   );
@@ -276,7 +338,7 @@ export const verifyUser = async (): Promise<{
       }
       const userData = await res.json();
       // Store userEmail
-      storage.set({ userEmail: userData.email }, () => { });
+      storage.set({ userEmail: userData.email }, () => {});
       resolve({ id: userData.id, role: userData.role, email: userData.email });
     });
   });

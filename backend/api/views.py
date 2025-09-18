@@ -1,10 +1,11 @@
-from rest_framework import viewsets, generics, status
+from rest_framework import viewsets, generics, status, serializers
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from django.contrib.auth.hashers import check_password, make_password
 from rest_framework.decorators import action
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework_simplejwt.views import TokenRefreshView
+from rest_framework_simplejwt.serializers import TokenRefreshSerializer
+from rest_framework_simplejwt.settings import api_settings
 from rest_framework.permissions import IsAuthenticated
 from .models import AppUser, Credential, Assignment
 from .serializers import AppUserSerializer, CredentialSerializer, AssignmentSerializer
@@ -22,7 +23,7 @@ class LoginView(generics.GenericAPIView):
         email = request.data.get("email")
         password = request.data.get("password")
         try:
-            user = AppUser.objects.get(email=email)
+            user = AppUser.objects.get(email__iexact=email)
             if check_password(password, user.password):
                 refresh = RefreshToken.for_user(user)
                 return Response(
@@ -139,6 +140,33 @@ class MeView(generics.RetrieveAPIView):
 
     def get_object(self):
         return self.request.user
+
+
+class AppUserTokenRefreshSerializer(TokenRefreshSerializer):
+    def validate(self, attrs):
+        from .models import AppUser
+        refresh = self.token_class(attrs["refresh"])
+        data = {"access": str(refresh.access_token)}
+        if api_settings.UPDATE_LAST_LOGIN:
+            from django.utils import timezone
+            user_id = refresh.payload.get('user_id')
+            try:
+                user = AppUser.objects.get(id=user_id)
+                user.last_login = timezone.now()
+                user.save()
+            except AppUser.DoesNotExist:
+                raise serializers.ValidationError("User not found")
+        return data
+
+
+class TokenRefreshView(generics.GenericAPIView):
+    serializer_class = AppUserTokenRefreshSerializer
+    permission_classes = [AllowAny]
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        return Response(serializer.validated_data, status=status.HTTP_200_OK)
 
 
 # ---------------- CREDENTIAL VIEWS ----------------

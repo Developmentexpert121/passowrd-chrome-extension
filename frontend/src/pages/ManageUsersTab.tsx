@@ -8,9 +8,24 @@ import {
 } from "../utils/api";
 import jsPDF from "jspdf";
 import Papa from "papaparse";
+import { BiEdit } from "react-icons/bi";
+import { FaTrash } from "react-icons/fa";
 
 type Role = "super_admin" | "admin" | "user";
 type Team = "designing" | "marketing" | "php" | "fullstack";
+
+interface User {
+  id: number;
+  email: string;
+  role: Role;
+  team: Team;
+}
+
+interface ApiResponse {
+  message?: string;
+  error?: string;
+  errors?: Record<string, string[]>;
+}
 
 export default function ManageUsersTab() {
   const [email, setEmail] = useState("");
@@ -18,7 +33,9 @@ export default function ManageUsersTab() {
   const [role, setRole] = useState<Role>("user");
   const [team, setTeam] = useState<Team>("designing");
   const [message, setMessage] = useState("");
-  const [users, setUsers] = useState<any[]>([]);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [users, setUsers] = useState<User[]>([]);
   const [editingUser, setEditingUser] = useState<number | null>(null);
   const [editData, setEditData] = useState<{
     email: string;
@@ -34,37 +51,79 @@ export default function ManageUsersTab() {
 
   useEffect(() => {
     fetchUsers().then((allUsers) => {
-      setUsers(allUsers.filter((u: any) => u.role !== "super_admin"));
+      setUsers(allUsers.filter((u: User) => u.role !== "super_admin"));
     });
   }, []);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    const res = await signupUser({ email, password, role, team });
-    setMessage(res.message ?? res.error ?? "");
-    if (res.message) {
-      // Refresh list
-      fetchUsers().then((allUsers) => {
-        setUsers(allUsers.filter((u: any) => u.role !== "super_admin"));
+    setLoading(true);
+    setMessage("");
+    setError("");
+    try {
+      const res: ApiResponse = await signupUser({
+        email,
+        password,
+        role,
+        team,
       });
-      // Clear form
-      setEmail("");
-      setPassword("");
-      setRole("user");
-      setTeam("designing");
+      console.log("Signup:", res);
+      if (res.message) {
+        setMessage(res.message);
+        // Refresh list
+        fetchUsers().then((allUsers) => {
+          setUsers(allUsers.filter((u: User) => u.role !== "super_admin"));
+        });
+        // Clear form only on success
+        setEmail("");
+        setPassword("");
+        setRole("user");
+        setTeam("designing");
+      } else if (res.error) {
+        setError(res.error);
+      } else if (res.errors) {
+        // Handle field-specific errors like {"email": ["app user with this email already exists."]}
+        const firstKey = Object.keys(res.errors)[0];
+        const firstError = res.errors[firstKey]?.[0];
+        if (firstError) {
+          throw new Error(firstError);
+        }
+        setError(firstError || "Validation error occurred.");
+      } else {
+        setError("Unknown error occurred.");
+      }
+    } catch (error: unknown) {
+      setError(
+        error instanceof Error
+          ? error.message
+          : "An error occurred while adding user."
+      );
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleDelete = async (userId: number) => {
-    const res = await deleteUser(userId);
-    if (res.message) {
-      setUsers(users.filter((u) => u.id !== userId));
-    } else {
-      setMessage(res.error ?? "Error deleting user");
+    try {
+      const res: ApiResponse = await deleteUser(userId);
+      if (res.message) {
+        setUsers(users.filter((u) => u.id !== userId));
+        setMessage(res.message);
+      } else if (res.error) {
+        setMessage(res.error);
+      } else {
+        setMessage("Unknown error occurred while deleting user.");
+      }
+    } catch (error: unknown) {
+      setMessage(
+        error instanceof Error
+          ? error.message
+          : "An error occurred while deleting user."
+      );
     }
   };
 
-  const handleEdit = (user: any) => {
+  const handleEdit = (user: User) => {
     setEditingUser(user.id);
     setEditData({
       email: user.email,
@@ -86,7 +145,7 @@ export default function ManageUsersTab() {
 
   const handleSaveEdit = async () => {
     if (editingUser === null) return;
-    const updatePayload: any = {
+    const updatePayload: Partial<User> & { password?: string } = {
       email: editData.email,
       role: editData.role,
       team: editData.team,
@@ -94,20 +153,32 @@ export default function ManageUsersTab() {
     if (editData.password.trim() !== "") {
       updatePayload.password = editData.password;
     }
-    const res = await updateUser(editingUser, updatePayload);
-    setMessage(res.message ?? res.error ?? "");
-    if (res.message) {
-      // Refresh list
-      fetchUsers().then((allUsers) => {
-        setUsers(allUsers.filter((u: any) => u.role !== "super_admin"));
-      });
-      setEditingUser(null);
-      setEditData({
-        email: "",
-        role: "user",
-        team: "designing",
-        password: "",
-      });
+    try {
+      const res: ApiResponse = await updateUser(editingUser, updatePayload);
+      if (res.message) {
+        setMessage(res.message);
+        // Refresh list
+        fetchUsers().then((allUsers) => {
+          setUsers(allUsers.filter((u: User) => u.role !== "super_admin"));
+        });
+        setEditingUser(null);
+        setEditData({
+          email: "",
+          role: "user",
+          team: "designing",
+          password: "",
+        });
+      } else if (res.error) {
+        setMessage(res.error);
+      } else {
+        setMessage("Unknown error occurred while updating user.");
+      }
+    } catch (error: unknown) {
+      setMessage(
+        error instanceof Error
+          ? error.message
+          : "An error occurred while updating user."
+      );
     }
   };
 
@@ -115,7 +186,7 @@ export default function ManageUsersTab() {
     try {
       const data = await exportUsers();
       const csv = Papa.unparse(
-        data.map(({ id, email, role, team }: any) => ({
+        data.map(({ id, email, role, team }: User) => ({
           id,
           email,
           role,
@@ -131,8 +202,10 @@ export default function ManageUsersTab() {
       link.click();
       document.body.removeChild(link);
       setMessage("CSV exported successfully");
-    } catch (error) {
-      setMessage("Failed to export CSV");
+    } catch (error: unknown) {
+      setMessage(
+        error instanceof Error ? error.message : "Failed to export CSV"
+      );
     }
   };
 
@@ -142,7 +215,7 @@ export default function ManageUsersTab() {
       const doc = new jsPDF();
       doc.text("Users List", 10, 10);
       let y = 20;
-      data.forEach((user: any) => {
+      data.forEach((user: User) => {
         doc.text(
           `ID: ${user.id}, Email: ${user.email}, Role: ${user.role}, Team: ${user.team}`,
           10,
@@ -156,8 +229,10 @@ export default function ManageUsersTab() {
       });
       doc.save("users.pdf");
       setMessage("PDF exported successfully");
-    } catch (error) {
-      setMessage("Failed to export PDF");
+    } catch (error: unknown) {
+      setMessage(
+        error instanceof Error ? error.message : "Failed to export PDF"
+      );
     }
   };
 
@@ -222,18 +297,27 @@ export default function ManageUsersTab() {
         </div>
         <button
           type="submit"
-          className="bg-primary-600 hover:bg-primary-700 px-4 py-2 rounded-md w-full text-white transition-colors"
+          disabled={loading}
+          className={`bg-primary-600 hover:bg-primary-700 px-4 py-2 rounded-md w-full text-white transition-colors ${
+            loading ? "opacity-50 cursor-not-allowed" : ""
+          }`}
         >
           Add User
         </button>
+
+        {error && (
+          <p className={`text-sm ${"text-red-600 dark:text-red-400"}`}>
+            {error}
+          </p>
+        )}
         {message && (
-          <p
-            className={`text-sm ${message.includes("success") || message.includes("User")
-              ? "text-green-600 dark:text-green-400"
-              : "text-red-600 dark:text-red-400"
-              }`}
-          >
+          <p className={`text-sm ${"text-green-600 dark:text-green-400"}`}>
             {message}
+          </p>
+        )}
+        {loading && (
+          <p className="text-blue-600 dark:text-blue-400 text-sm">
+            Adding user...
           </p>
         )}
       </form>
@@ -312,18 +396,18 @@ export default function ManageUsersTab() {
                       Role: {u.role}, Team: {u.team}
                     </p>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex flex-col gap-2">
                     <button
                       onClick={() => handleEdit(u)}
                       className="bg-blue-500 hover:bg-blue-600 px-3 py-1 rounded-md text-white transition-colors"
                     >
-                      Edit
+                      <BiEdit />
                     </button>
                     <button
                       onClick={() => handleDelete(u.id)}
                       className="bg-red-500 hover:bg-red-600 px-3 py-1 rounded-md text-white transition-colors"
                     >
-                      Delete
+                      <FaTrash />
                     </button>
                   </div>
                 </div>

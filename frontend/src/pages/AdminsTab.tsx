@@ -1,6 +1,16 @@
 import { useEffect, useState } from "react";
-import { fetchAdmins, fetchCredentialsForUser, removeUserAccessFromCredential } from "../utils/api";
-import { FiChevronDown, FiChevronUp, FiX, FiMail, FiGlobe } from "react-icons/fi";
+import {
+  fetchAdmins,
+  fetchCredentialsForUser,
+  removeUserAccessFromCredential,
+} from "../utils/api";
+import {
+  FiChevronDown,
+  FiChevronUp,
+  FiX,
+  FiMail,
+  FiGlobe,
+} from "react-icons/fi";
 
 interface AdminsTabProps {
   user: { role: "super_admin" | "admin" | "user" };
@@ -8,7 +18,9 @@ interface AdminsTabProps {
 
 export default function AdminsTab({ user }: AdminsTabProps) {
   const [admins, setAdmins] = useState<any[]>([]);
-  const [credentials, setCredentials] = useState<{ [userId: number]: any[] }>({});
+  const [credentials, setCredentials] = useState<{ [userId: number]: any[] }>(
+    {}
+  );
   const [expanded, setExpanded] = useState<{ [userId: number]: boolean }>({});
 
   useEffect(() => {
@@ -17,11 +29,11 @@ export default function AdminsTab({ user }: AdminsTabProps) {
 
   const fetchCredentials = async (userId: number) => {
     const creds = await fetchCredentialsForUser(userId);
-    setCredentials(prev => ({ ...prev, [userId]: creds }));
+    setCredentials((prev) => ({ ...prev, [userId]: creds }));
   };
 
   const toggleExpanded = (userId: number) => {
-    setExpanded(prev => ({ ...prev, [userId]: !prev[userId] }));
+    setExpanded((prev) => ({ ...prev, [userId]: !prev[userId] }));
     if (!credentials[userId]) {
       fetchCredentials(userId);
     }
@@ -41,7 +53,7 @@ export default function AdminsTab({ user }: AdminsTabProps) {
         admins.map((a) => (
           <div
             key={a.id}
-            className="bg-gray-50 dark:bg-gray-700 p-3 border border-gray-200 dark:border-gray-600 rounded-md"
+            className="bg-gray-50 dark:bg-gray-700 p-3 border border-gray-200 dark:border-gray-600 rounded-md text-gray-50"
           >
             <div className="flex justify-between items-center">
               <div>
@@ -61,14 +73,16 @@ export default function AdminsTab({ user }: AdminsTabProps) {
               )}
             </div>
             {expanded[a.id] && (
-              <div className="mt-3 space-y-2">
+              <div className="space-y-2 mt-3">
                 {credentials[a.id]?.length === 0 ? (
-                  <p className="text-gray-500 text-sm">No credentials assigned.</p>
+                  <p className="text-gray-500 text-sm">
+                    No credentials assigned.
+                  </p>
                 ) : (
                   credentials[a.id]?.map((c) => (
                     <div
                       key={c.id}
-                      className="bg-white dark:bg-gray-800 p-2 rounded border flex justify-between items-center"
+                      className="flex justify-between items-center bg-white dark:bg-gray-800 p-2 border rounded"
                     >
                       <div>
                         <p className="flex items-center gap-1 text-sm">
@@ -82,7 +96,7 @@ export default function AdminsTab({ user }: AdminsTabProps) {
                         onClick={() => handleRemoveAccess(c.id, a.id)}
                         className="flex items-center gap-1 bg-red-500 hover:bg-red-600 px-2 py-1 rounded text-white text-sm"
                       >
-                        <FiX /> Remove
+                        <FiX />
                       </button>
                     </div>
                   ))
