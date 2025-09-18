@@ -65,16 +65,42 @@ export default function CredentialsTab({ user }: CredentialsTabProps) {
     setFormData({ email: "", password: "", website: "" });
   };
 
-  const handleFill = async (c: { email: string; password: string }) => {
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const handleFill = async (c: {
+    email: string;
+    password: string;
+    website?: string;
+  }) => {
+    setErrorMessage(null);
     const [tab] = await chrome.tabs.query({
       active: true,
       currentWindow: true,
     });
-    if (tab && tab.id) {
+    if (tab && tab.id && tab.url) {
+      const currentHostname = new URL(tab.url).hostname;
+      let storedHostname = null;
+      if (c.website) {
+        try {
+          storedHostname = new URL(c.website).hostname;
+        } catch (e) {
+          storedHostname = c.website; // If not a URL, use as is
+        }
+      }
+      // Normalize by removing www
+      const normalize = (host: string) => host.replace(/^www\./, "");
+      if (
+        storedHostname &&
+        normalize(currentHostname) !== normalize(storedHostname)
+      ) {
+        setErrorMessage("Credential website does not match current site.");
+        return;
+      }
       chrome.tabs.sendMessage(tab.id, {
         action: "fillCredentials",
         email: c.email,
         password: c.password,
+        website: storedHostname,
       });
     }
   };
@@ -133,6 +159,11 @@ export default function CredentialsTab({ user }: CredentialsTabProps) {
 
   return (
     <div className="space-y-6">
+      {errorMessage && (
+        <div className="bg-red-100 dark:bg-red-900 px-4 py-3 border border-red-400 rounded text-red-700 dark:text-red-300">
+          {errorMessage}
+        </div>
+      )}
       {user.role === "super_admin" && (
         <>
           <button
