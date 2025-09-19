@@ -237,17 +237,17 @@ export default function ManageUsersTab() {
   };
 
   return (
-    <div className="space-y-6 text-gray-50">
+    <div className="space-y-6 text-gray-900 dark:text-gray-50">
       <div className="flex gap-2">
         <button
           onClick={exportCSV}
-          className="bg-green-500 hover:bg-green-600 px-4 py-2 rounded-md text-white"
+          className="px-4 py-2 text-white bg-green-500 rounded-md cursor-pointer hover:bg-green-600"
         >
           Export CSV
         </button>
         <button
           onClick={exportPDF}
-          className="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-md text-white"
+          className="px-4 py-2 text-white bg-blue-500 rounded-md cursor-pointer hover:bg-blue-600"
         >
           Export PDF
         </button>
@@ -259,7 +259,7 @@ export default function ManageUsersTab() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="bg-white dark:bg-gray-800 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 w-full"
+            className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md dark:bg-gray-800 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary-500"
           />
         </div>
         <div>
@@ -269,14 +269,14 @@ export default function ManageUsersTab() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            className="bg-white dark:bg-gray-800 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 w-full"
+            className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md dark:bg-gray-800 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary-500"
           />
         </div>
         <div>
           <select
             value={role}
             onChange={(e) => setRole(e.target.value as Role)}
-            className="bg-white dark:bg-gray-800 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 w-full"
+            className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md dark:bg-gray-800 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary-500"
           >
             <option value="super_admin">Super Admin</option>
             <option value="admin">Admin</option>
@@ -287,20 +287,20 @@ export default function ManageUsersTab() {
           <select
             value={team}
             onChange={(e) => setTeam(e.target.value as Team)}
-            className="bg-white dark:bg-gray-800 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 w-full"
+            className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md dark:bg-gray-800 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary-500"
           >
+            <option value="management">Management</option>
+            <option value="fullstack">Fullstack</option>
+            <option value="php">PHP</option>
             <option value="designing">Designing</option>
             <option value="marketing">Marketing</option>
-            <option value="php">PHP</option>
-            <option value="fullstack">Fullstack</option>
           </select>
         </div>
         <button
           type="submit"
           disabled={loading}
-          className={`bg-primary-600 hover:bg-primary-700 px-4 py-2 rounded-md w-full text-white transition-colors ${
-            loading ? "opacity-50 cursor-not-allowed" : ""
-          }`}
+          className={`cursor-pointer bg-primary-600 hover:bg-primary-700 px-4 py-2 rounded-md w-full text-white transition-colors ${loading ? "opacity-50 cursor-not-allowed" : ""
+            }`}
         >
           Add User
         </button>
@@ -316,21 +316,21 @@ export default function ManageUsersTab() {
           </p>
         )}
         {loading && (
-          <p className="text-blue-600 dark:text-blue-400 text-sm">
+          <p className="text-sm text-blue-600 dark:text-blue-400">
             Adding user...
           </p>
         )}
       </form>
 
       <div className="space-y-2">
-        <h3 className="font-semibold text-lg">Users</h3>
+        <h3 className="text-lg font-semibold">Users</h3>
         {users.length === 0 ? (
           <p className="text-gray-500 dark:text-gray-400">No users found.</p>
         ) : (
           users.map((u) => (
             <div
               key={u.id}
-              className="bg-gray-50 dark:bg-gray-700 p-3 border border-gray-200 dark:border-gray-600 rounded-md"
+              className="p-3 border border-gray-200 rounded-md bg-gray-50 dark:bg-gray-700 dark:border-gray-600"
             >
               {editingUser === u.id ? (
                 <div className="space-y-2">
@@ -340,14 +340,14 @@ export default function ManageUsersTab() {
                     onChange={(e) =>
                       setEditData({ ...editData, email: e.target.value })
                     }
-                    className="bg-white dark:bg-gray-800 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 w-full"
+                    className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md dark:bg-gray-800 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary-500"
                   />
                   <select
                     value={editData.role}
                     onChange={(e) =>
                       setEditData({ ...editData, role: e.target.value as Role })
                     }
-                    className="bg-white dark:bg-gray-800 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 w-full"
+                    className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md dark:bg-gray-800 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary-500"
                   >
                     <option value="admin">Admin</option>
                     <option value="user">User</option>
@@ -357,12 +357,13 @@ export default function ManageUsersTab() {
                     onChange={(e) =>
                       setEditData({ ...editData, team: e.target.value as Team })
                     }
-                    className="bg-white dark:bg-gray-800 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 w-full"
+                    className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md dark:bg-gray-800 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary-500"
                   >
+                    <option value="management">Management</option>
+                    <option value="fullstack">Fullstack</option>
+                    <option value="php">PHP</option>
                     <option value="designing">Designing</option>
                     <option value="marketing">Marketing</option>
-                    <option value="php">PHP</option>
-                    <option value="fullstack">Fullstack</option>
                   </select>
                   <input
                     placeholder="New Password (leave empty to keep current)"
@@ -371,41 +372,41 @@ export default function ManageUsersTab() {
                     onChange={(e) =>
                       setEditData({ ...editData, password: e.target.value })
                     }
-                    className="bg-white dark:bg-gray-800 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 w-full"
+                    className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md dark:bg-gray-800 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary-500"
                   />
                   <div className="flex gap-2">
                     <button
                       onClick={handleSaveEdit}
-                      className="bg-green-500 hover:bg-green-600 px-3 py-1 rounded-md text-white"
+                      className="px-3 py-1 text-white bg-green-500 rounded-md cursor-pointer hover:bg-green-600"
                     >
                       Save
                     </button>
                     <button
                       onClick={handleCancelEdit}
-                      className="bg-gray-500 hover:bg-gray-600 px-3 py-1 rounded-md text-white"
+                      className="px-3 py-1 text-white bg-gray-500 rounded-md cursor-pointer hover:bg-gray-600"
                     >
                       Cancel
                     </button>
                   </div>
                 </div>
               ) : (
-                <div className="flex justify-between items-center">
+                <div className="flex items-center justify-between">
                   <div>
                     <p className="font-medium">{u.email}</p>
-                    <p className="text-gray-600 dark:text-gray-300 text-sm">
+                    <p className="text-sm text-gray-600 dark:text-gray-300">
                       Role: {u.role}, Team: {u.team}
                     </p>
                   </div>
                   <div className="flex flex-col gap-2">
                     <button
                       onClick={() => handleEdit(u)}
-                      className="bg-blue-500 hover:bg-blue-600 px-3 py-1 rounded-md text-white transition-colors"
+                      className="px-3 py-1 text-white transition-colors bg-blue-500 rounded-md cursor-pointer hover:bg-blue-600"
                     >
                       <BiEdit />
                     </button>
                     <button
                       onClick={() => handleDelete(u.id)}
-                      className="bg-red-500 hover:bg-red-600 px-3 py-1 rounded-md text-white transition-colors"
+                      className="px-3 py-1 text-white transition-colors bg-red-500 rounded-md cursor-pointer hover:bg-red-600"
                     >
                       <FaTrash />
                     </button>

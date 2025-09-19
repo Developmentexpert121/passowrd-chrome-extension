@@ -33,25 +33,25 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
   };
 
   return (
-    <div className="bg-gray-50 p-4 w-96 min-h-screen text-gray-900">
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="font-semibold text-xl">
+    <div className="min-h-screen p-4 text-gray-900 bg-gray-50 dark:bg-gray-600 w-96 dark:text-gray-50">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-xl font-semibold dark:text-gray-50">
           {user.email}
         </h3>
         <button
           onClick={handleLogout}
-          className="bg-red-500 hover:bg-red-600 px-3 py-1 rounded-md text-white transition-colors"
+          className="px-3 py-1 text-white transition-colors bg-red-500 rounded-md cursor-pointer hover:bg-red-600"
         >
           Logout
         </button>
       </div>
-      <div className="flex mb-4 border-gray-300 border-b">
+      <div className="flex border-b border-gray-300">
         {tabs.map((t) => (
           <button
             key={t.key}
-            className={`px-4 py-2 border-r border-gray-300 last:border-r-0 transition-colors ${activeTab === t.key
+            className={`px-3.5 py-2 border-r border-gray-300 last:border-r-0 transition-colors ${activeTab === t.key
               ? "bg-primary-500 text-white border-b-0"
-              : "bg-gray-100 hover:bg-gray-200"
+              : "bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-800 "
               }`}
             onClick={() => setActiveTab(t.key)}
           >
@@ -59,7 +59,7 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
           </button>
         ))}
       </div>
-      <div className="bg-white shadow-sm p-4 rounded-md">
+      <div className="p-4 bg-white shadow-sm dark:bg-gray-500 rounded-b-md">
         {activeTab === "credentials" && <CredentialsTab user={user} />}
         {activeTab === "admins" && <AdminsTab user={user} />}
         {activeTab === "users" && <UsersTab user={user} />}

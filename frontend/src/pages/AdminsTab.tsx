@@ -46,26 +46,26 @@ export default function AdminsTab({ user }: AdminsTabProps) {
   };
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-2 text-gray-900 dark:text-gray-50">
       {admins.length === 0 ? (
         <p className="text-gray-500 dark:text-gray-400">No admins found.</p>
       ) : (
         admins.map((a) => (
           <div
             key={a.id}
-            className="bg-gray-50 dark:bg-gray-700 p-3 border border-gray-200 dark:border-gray-600 rounded-md text-gray-50"
+            className="p-3 border border-gray-200 rounded-md bg-gray-50 dark:bg-gray-700 dark:border-gray-600 "
           >
-            <div className="flex justify-between items-center">
+            <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium">{a.email}</p>
-                <p className="text-gray-600 dark:text-gray-300 text-sm">
+                <p className="text-sm text-gray-600 dark:text-gray-300">
                   Team: {a.team}
                 </p>
               </div>
               {(user.role === "super_admin" || user.role === "admin") && (
                 <button
                   onClick={() => toggleExpanded(a.id)}
-                  className="flex items-center gap-1 text-blue-500 hover:text-blue-600"
+                  className="flex items-center gap-1 text-blue-500 cursor-pointer hover:text-blue-600"
                 >
                   {expanded[a.id] ? <FiChevronUp /> : <FiChevronDown />}
                   Credentials
@@ -73,28 +73,28 @@ export default function AdminsTab({ user }: AdminsTabProps) {
               )}
             </div>
             {expanded[a.id] && (
-              <div className="space-y-2 mt-3">
+              <div className="mt-3 space-y-2">
                 {credentials[a.id]?.length === 0 ? (
-                  <p className="text-gray-500 text-sm">
+                  <p className="text-sm text-gray-500">
                     No credentials assigned.
                   </p>
                 ) : (
                   credentials[a.id]?.map((c) => (
                     <div
                       key={c.id}
-                      className="flex justify-between items-center bg-white dark:bg-gray-800 p-2 border rounded"
+                      className="flex items-center justify-between p-2 bg-white border rounded dark:bg-gray-800"
                     >
                       <div>
                         <p className="flex items-center gap-1 text-sm">
                           <FiGlobe /> {c.website || "N/A"}
                         </p>
-                        <p className="flex items-center gap-1 font-medium text-sm">
+                        <p className="flex items-center gap-1 text-sm font-medium">
                           <FiMail /> {c.email}
                         </p>
                       </div>
                       <button
                         onClick={() => handleRemoveAccess(c.id, a.id)}
-                        className="flex items-center gap-1 bg-red-500 hover:bg-red-600 px-2 py-1 rounded text-white text-sm"
+                        className="flex items-center gap-1 px-2 py-1 text-sm text-white bg-red-500 rounded cursor-pointer hover:bg-red-600"
                       >
                         <FiX />
                       </button>

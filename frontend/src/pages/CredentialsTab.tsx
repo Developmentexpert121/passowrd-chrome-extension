@@ -160,7 +160,7 @@ export default function CredentialsTab({ user }: CredentialsTabProps) {
   return (
     <div className="space-y-6">
       {errorMessage && (
-        <div className="bg-red-100 dark:bg-red-900 px-4 py-3 border border-red-400 rounded text-red-700 dark:text-red-300">
+        <div className="px-4 py-3 text-red-700 bg-red-100 border border-red-400 rounded dark:bg-red-900 dark:text-red-300">
           {errorMessage}
         </div>
       )}
@@ -168,7 +168,7 @@ export default function CredentialsTab({ user }: CredentialsTabProps) {
         <>
           <button
             onClick={() => setShowForm(!showForm)}
-            className="flex items-center gap-2 bg-primary-600 hover:bg-primary-700 px-4 py-2 rounded-md text-white transition-colors"
+            className="flex items-center gap-2 px-4 py-2 text-white transition-colors rounded-md cursor-pointer bg-primary-600 hover:bg-primary-700"
           >
             {showForm ? <FiX /> : <FiPlus />}
             {showForm ? "Cancel" : "Add New Credential"}
@@ -177,10 +177,10 @@ export default function CredentialsTab({ user }: CredentialsTabProps) {
           {showForm && (
             <form
               onSubmit={handleSubmit}
-              className="space-y-4 bg-gray-100 dark:bg-gray-700 p-4 rounded-md"
+              className="p-4 space-y-4 bg-gray-100 rounded-md dark:bg-gray-700"
             >
               <div>
-                <label className="block flex items-center gap-1 mb-1 font-medium text-sm">
+                <label className="flex items-center block gap-1 mb-1 text-sm font-medium">
                   <FiMail /> Email:
                 </label>
                 <input
@@ -190,11 +190,11 @@ export default function CredentialsTab({ user }: CredentialsTabProps) {
                     setFormData({ ...formData, email: e.target.value })
                   }
                   required
-                  className="bg-white dark:bg-gray-800 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 w-full"
+                  className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md dark:bg-gray-800 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary-500"
                 />
               </div>
               <div>
-                <label className="block flex items-center gap-1 mb-1 font-medium text-sm">
+                <label className="flex items-center block gap-1 mb-1 text-sm font-medium">
                   <FiLock /> Password:
                 </label>
                 <input
@@ -204,11 +204,11 @@ export default function CredentialsTab({ user }: CredentialsTabProps) {
                     setFormData({ ...formData, password: e.target.value })
                   }
                   required
-                  className="bg-white dark:bg-gray-800 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 w-full"
+                  className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md dark:bg-gray-800 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary-500"
                 />
               </div>
               <div>
-                <label className="block flex items-center gap-1 mb-1 font-medium text-sm">
+                <label className="flex items-center block gap-1 mb-1 text-sm font-medium">
                   <FiGlobe /> Website:
                 </label>
                 <input
@@ -217,12 +217,12 @@ export default function CredentialsTab({ user }: CredentialsTabProps) {
                   onChange={(e) =>
                     setFormData({ ...formData, website: e.target.value })
                   }
-                  className="bg-white dark:bg-gray-800 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 w-full"
+                  className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md dark:bg-gray-800 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary-500"
                 />
               </div>
               <button
                 type="submit"
-                className="flex justify-center items-center gap-2 bg-primary-600 hover:bg-primary-700 px-4 py-2 rounded-md w-full text-white transition-colors"
+                className="flex items-center justify-center w-full gap-2 px-4 py-2 text-white transition-colors rounded-md cursor-pointer bg-primary-600 hover:bg-primary-700"
               >
                 <FaKey /> Submit
               </button>
@@ -240,7 +240,7 @@ export default function CredentialsTab({ user }: CredentialsTabProps) {
         ) : (
           creds.map((c) => (
             <div key={c.id}>
-              <div className="flex justify-between items-center bg-gray-50 hover:bg-primary-50 dark:bg-gray-700 dark:hover:bg-gray-600 p-3 border border-gray-200 dark:border-gray-600 rounded-md text-gray-600 dark:text-gray-300 transition-colors">
+              <div className="flex items-center justify-between p-3 text-gray-600 transition-colors border border-gray-200 rounded-md bg-gray-50 hover:bg-primary-50 dark:bg-gray-700 dark:hover:bg-gray-600 dark:border-gray-600 dark:text-gray-300">
                 <div>
                   <p className="flex items-center gap-2 text-sm">
                     <FiGlobe /> {c.website || "N/A"}
@@ -252,14 +252,14 @@ export default function CredentialsTab({ user }: CredentialsTabProps) {
                 <div className="flex flex-col gap-1">
                   <button
                     onClick={() => handleFill(c)}
-                    className="flex items-center gap-1 bg-blue-500 hover:bg-blue-600 px-3 py-1 rounded-md text-white text-sm transition-colors"
+                    className="flex items-center gap-1 px-3 py-1 text-sm text-white transition-colors bg-blue-500 rounded-md cursor-pointer hover:bg-blue-600"
                   >
                     <FaKey /> Apply
                   </button>
                   {(user.role === "super_admin" || user.role === "admin") && (
                     <button
                       onClick={() => handleOpenDetails(c.id)}
-                      className="flex items-center gap-1 bg-green-500 hover:bg-green-600 px-3 py-1 rounded-md text-white text-sm transition-colors"
+                      className="flex items-center gap-1 px-3 py-1 text-sm text-white transition-colors bg-green-500 rounded-md cursor-pointer hover:bg-green-600"
                     >
                       <IoOpenOutline /> Open
                     </button>
@@ -281,7 +281,7 @@ export default function CredentialsTab({ user }: CredentialsTabProps) {
                           }
                         }
                       }}
-                      className="flex items-center gap-1 bg-red-600 hover:bg-red-700 px-3 py-1 rounded-md text-white text-sm transition-colors"
+                      className="flex items-center gap-1 px-3 py-1 text-sm text-white transition-colors bg-red-600 rounded-md cursor-pointer hover:bg-red-700"
                     >
                       <FiTrash /> Delete
                     </button>
@@ -289,18 +289,18 @@ export default function CredentialsTab({ user }: CredentialsTabProps) {
                 </div>
               </div>
               {showDetails && selectedCredential === c.id && (
-                <div className="bg-gray-100 dark:bg-gray-700 shadow mt-3 p-4 rounded-md text-gray-600 dark:text-gray-300">
-                  <div className="flex justify-between items-center mb-3">
-                    <h3 className="flex items-center gap-2 font-semibold text-lg">
+                <div className="p-4 mt-3 text-gray-600 bg-gray-100 rounded-md shadow dark:bg-gray-700 dark:text-gray-300">
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="flex items-center gap-2 text-lg font-semibold">
                       <FaKey />{" "}
                       {isEditing ? "Edit Credential" : "Credential Details"}
                     </h3>
                     {user.role === "super_admin" && !isEditing && (
                       <button
                         onClick={handleEdit}
-                        className="flex items-center gap-1 bg-blue-500 hover:bg-blue-600 px-3 py-1 rounded-md text-white text-sm transition-colors"
+                        className="items-center gap-1 p-2 text-sm text-white transition-colors bg-blue-500 rounded-md cursor-pointerflex hover:bg-blue-600"
                       >
-                        <FiEdit /> Edit
+                        <FiEdit />
                       </button>
                     )}
                   </div>
@@ -308,7 +308,7 @@ export default function CredentialsTab({ user }: CredentialsTabProps) {
                   {isEditing ? (
                     <form onSubmit={handleEditSubmit} className="space-y-4">
                       <div>
-                        <label className="block flex items-center gap-1 mb-1 font-medium text-sm">
+                        <label className="flex items-center block gap-1 mb-1 text-sm font-medium">
                           <FiMail /> Email:
                         </label>
                         <input
@@ -321,11 +321,11 @@ export default function CredentialsTab({ user }: CredentialsTabProps) {
                             })
                           }
                           required
-                          className="bg-white dark:bg-gray-800 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 w-full"
+                          className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md dark:bg-gray-800 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary-500"
                         />
                       </div>
                       <div>
-                        <label className="block flex items-center gap-1 mb-1 font-medium text-sm">
+                        <label className="flex items-center block gap-1 mb-1 text-sm font-medium">
                           <FiLock /> Password:
                         </label>
                         <input
@@ -338,11 +338,11 @@ export default function CredentialsTab({ user }: CredentialsTabProps) {
                             })
                           }
                           required
-                          className="bg-white dark:bg-gray-800 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 w-full"
+                          className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md dark:bg-gray-800 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary-500"
                         />
                       </div>
                       <div>
-                        <label className="block flex items-center gap-1 mb-1 font-medium text-sm">
+                        <label className="flex items-center block gap-1 mb-1 text-sm font-medium">
                           <FiGlobe /> Website:
                         </label>
                         <input
@@ -354,20 +354,20 @@ export default function CredentialsTab({ user }: CredentialsTabProps) {
                               website: e.target.value,
                             })
                           }
-                          className="bg-white dark:bg-gray-800 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 w-full"
+                          className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md dark:bg-gray-800 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary-500"
                         />
                       </div>
                       <div className="flex gap-2">
                         <button
                           type="submit"
-                          className="flex items-center gap-1 bg-green-500 hover:bg-green-600 px-4 py-2 rounded-md text-white transition-colors"
+                          className="flex items-center gap-1 px-4 py-2 text-white transition-colors bg-green-500 rounded-md cursor-pointer hover:bg-green-600"
                         >
                           Save
                         </button>
                         <button
                           type="button"
                           onClick={handleEditCancel}
-                          className="flex items-center gap-1 bg-gray-500 hover:bg-gray-600 px-4 py-2 rounded-md text-white transition-colors"
+                          className="flex items-center gap-1 px-4 py-2 text-white transition-colors bg-gray-500 rounded-md cursor-pointer hover:bg-gray-600"
                         >
                           Cancel
                         </button>
@@ -387,14 +387,14 @@ export default function CredentialsTab({ user }: CredentialsTabProps) {
                             {assignedUsers.map((u: any) => (
                               <li
                                 key={u.id}
-                                className="flex justify-between items-center bg-white dark:bg-gray-800 p-2 rounded"
+                                className="flex items-center justify-between p-2 bg-white rounded dark:bg-gray-800"
                               >
                                 <span>
                                   {u.email} ({u.role})
                                 </span>
                                 <button
                                   onClick={() => handleRemoveUserAccess(u.id)}
-                                  className="flex items-center gap-1 bg-red-500 hover:bg-red-600 px-2 py-1 rounded text-white text-sm"
+                                  className="flex items-center gap-1 px-2 py-1 text-sm text-white bg-red-500 rounded cursor-pointer hover:bg-red-600"
                                 >
                                   <FiUserX />
                                 </button>
@@ -415,7 +415,7 @@ export default function CredentialsTab({ user }: CredentialsTabProps) {
                             if (userId) handleAddUserAccess(userId);
                             e.target.value = "";
                           }}
-                          className="bg-white dark:bg-gray-800 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md w-full"
+                          className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md dark:bg-gray-800 dark:border-gray-600"
                         >
                           <option value="">Select a user</option>
                           {allUsers
@@ -435,7 +435,7 @@ export default function CredentialsTab({ user }: CredentialsTabProps) {
 
                       <button
                         onClick={() => setShowDetails(false)}
-                        className="flex items-center gap-1 bg-gray-500 hover:bg-gray-600 mt-4 px-4 py-2 rounded-md text-white transition-colors"
+                        className="flex items-center gap-1 px-4 py-2 mt-4 text-white transition-colors bg-gray-500 rounded-md cursor-pointer hover:bg-gray-600"
                       >
                         <FiX /> Close
                       </button>
