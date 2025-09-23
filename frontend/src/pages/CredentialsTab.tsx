@@ -1,13 +1,14 @@
 import { useEffect, useState, type FormEvent } from "react";
 import {
   fetchCredentials,
-  addCredential,
   deleteCredential,
   updateCredential,
+  fetchTeams,
+  removeUserAccessFromCredential,
+  addCredential,
   fetchUsersForCredential,
   addUserAccessToCredential,
-  removeUserAccessFromCredential,
-  fetchUsers,
+  fetchWithToken,
 } from "../utils/api";
 
 // icons
@@ -26,18 +27,21 @@ import { FaKey } from "react-icons/fa";
 import { IoOpenOutline } from "react-icons/io5";
 
 interface CredentialsTabProps {
-  user: { role: "super_admin" | "admin" | "user" };
+  user: { role: "super_admin" | "admin" | "user", id: number };
 }
 
 export default function CredentialsTab({ user }: CredentialsTabProps) {
+
   const [creds, setCreds] = useState<
     { id: number; email: string; password: string; website?: string }[]
   >([]);
+  const [_teams, setTeams] = useState<any[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
     website: "",
+    assigned_to_team_ids: [] as string[],
   });
   const [selectedCredential, setSelectedCredential] = useState<number | null>(
     null
@@ -54,15 +58,34 @@ export default function CredentialsTab({ user }: CredentialsTabProps) {
 
   useEffect(() => {
     fetchCredentials().then(setCreds);
+    fetchTeams().then(setTeams);
   }, []);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    await addCredential(formData);
+
+    console.log("Add credential hit")
+    // Prepare payload with required fields for CredentialData
+    const payload = {
+      owner_id: "", // Should be set to current user id or handled in backend
+      title: formData.email, // Using email as title for example
+      meta: {
+        url: formData.website,
+        email: formData.email,
+      },
+      cipher_algo: "", // Should be set appropriately
+      ciphertext: "", // Should be set appropriately
+      password: formData.password,
+      acl: [],
+      assigned_to_team_ids: formData.assigned_to_team_ids,
+    };
+
+    console.log("Add credential Payload", payload)
+    await addCredential(payload);
     const newCreds = await fetchCredentials();
     setCreds(newCreds);
     setShowForm(false);
-    setFormData({ email: "", password: "", website: "" });
+    setFormData({ email: "", password: "", website: "", assigned_to_team_ids: [] });
   };
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -110,13 +133,13 @@ export default function CredentialsTab({ user }: CredentialsTabProps) {
     setShowDetails(true);
     const users = await fetchUsersForCredential(credentialId);
     setAssignedUsers(users);
-    const all = await fetchUsers();
+    const all = await fetchWithToken<any[]>("/users/?for_sharing=true");
     setAllUsers(all);
   };
 
   const handleAddUserAccess = async (userId: number) => {
     if (selectedCredential) {
-      await addUserAccessToCredential(selectedCredential, userId);
+      await addUserAccessToCredential(selectedCredential, userId.toString());
       const users = await fetchUsersForCredential(selectedCredential);
       setAssignedUsers(users);
     }
@@ -124,7 +147,7 @@ export default function CredentialsTab({ user }: CredentialsTabProps) {
 
   const handleRemoveUserAccess = async (userId: number) => {
     if (selectedCredential) {
-      await removeUserAccessFromCredential(selectedCredential, userId);
+      await removeUserAccessFromCredential(selectedCredential, userId.toString());
       const users = await fetchUsersForCredential(selectedCredential);
       setAssignedUsers(users);
     }
@@ -145,7 +168,7 @@ export default function CredentialsTab({ user }: CredentialsTabProps) {
   const handleEditSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (selectedCredential) {
-      await updateCredential(selectedCredential, editFormData);
+      await updateCredential(`${selectedCredential}`, editFormData as any);
       const newCreds = await fetchCredentials();
       setCreds(newCreds);
       setIsEditing(false);
@@ -220,6 +243,26 @@ export default function CredentialsTab({ user }: CredentialsTabProps) {
                   className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md dark:bg-gray-800 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary-500"
                 />
               </div>
+              {/* <div>
+                <label className="flex items-center block gap-1 mb-1 text-sm font-medium">
+                  Teams:
+                </label>
+                <select
+                  multiple
+                  value={formData.assigned_to_team_ids}
+                  onChange={(e) => {
+                    const selectedOptions = Array.from(e.target.selectedOptions, option => option.value);
+                    setFormData({ ...formData, assigned_to_team_ids: selectedOptions });
+                  }}
+                  className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md dark:bg-gray-800 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                >
+                  {teams.map((team: any) => (
+                    <option key={team.id} value={team.id}>
+                      {team.name}
+                    </option>
+                  ))}
+                </select>
+              </div> */}
               <button
                 type="submit"
                 className="flex items-center justify-center w-full gap-2 px-4 py-2 text-white transition-colors rounded-md cursor-pointer bg-primary-600 hover:bg-primary-700"
@@ -254,14 +297,14 @@ export default function CredentialsTab({ user }: CredentialsTabProps) {
                     onClick={() => handleFill(c)}
                     className="flex items-center gap-1 px-3 py-1 text-sm text-white transition-colors bg-blue-500 rounded-md cursor-pointer hover:bg-blue-600"
                   >
-                    <FaKey /> Apply
+                    <FaKey />
                   </button>
                   {(user.role === "super_admin" || user.role === "admin") && (
                     <button
                       onClick={() => handleOpenDetails(c.id)}
                       className="flex items-center gap-1 px-3 py-1 text-sm text-white transition-colors bg-green-500 rounded-md cursor-pointer hover:bg-green-600"
                     >
-                      <IoOpenOutline /> Open
+                      <IoOpenOutline />
                     </button>
                   )}
                   {user.role === "super_admin" && (
@@ -272,7 +315,7 @@ export default function CredentialsTab({ user }: CredentialsTabProps) {
                             "Are you sure you want to delete this credential?"
                           )
                         ) {
-                          await deleteCredential(c.id);
+                          await deleteCredential(`${c.id}`);
                           const newCreds = await fetchCredentials();
                           setCreds(newCreds);
                           if (selectedCredential === c.id) {
@@ -283,7 +326,7 @@ export default function CredentialsTab({ user }: CredentialsTabProps) {
                       }}
                       className="flex items-center gap-1 px-3 py-1 text-sm text-white transition-colors bg-red-600 rounded-md cursor-pointer hover:bg-red-700"
                     >
-                      <FiTrash /> Delete
+                      <FiTrash />
                     </button>
                   )}
                 </div>
@@ -384,22 +427,26 @@ export default function CredentialsTab({ user }: CredentialsTabProps) {
                           <p className="text-gray-500">No users assigned.</p>
                         ) : (
                           <ul className="space-y-2">
-                            {assignedUsers.map((u: any) => (
-                              <li
-                                key={u.id}
-                                className="flex items-center justify-between p-2 bg-white rounded dark:bg-gray-800"
-                              >
-                                <span>
-                                  {u.email} ({u.role})
-                                </span>
-                                <button
-                                  onClick={() => handleRemoveUserAccess(u.id)}
-                                  className="flex items-center gap-1 px-2 py-1 text-sm text-white bg-red-500 rounded cursor-pointer hover:bg-red-600"
+                            {assignedUsers
+                              .filter(
+                                (u: any) => user.id !== u.id && u.role !== "super_admin"
+                              )
+                              .map((u: any) => (
+                                <li
+                                  key={u.id}
+                                  className="flex items-center justify-between p-2 bg-white rounded dark:bg-gray-800"
                                 >
-                                  <FiUserX />
-                                </button>
-                              </li>
-                            ))}
+                                  <span>
+                                    {u.email} ({u.role})
+                                  </span>
+                                  <button
+                                    onClick={() => handleRemoveUserAccess(u.id)}
+                                    className="flex items-center gap-1 px-2 py-1 text-sm text-white bg-red-500 rounded cursor-pointer hover:bg-red-600"
+                                  >
+                                    <FiUserX />
+                                  </button>
+                                </li>
+                              ))}
                           </ul>
                         )}
                       </div>

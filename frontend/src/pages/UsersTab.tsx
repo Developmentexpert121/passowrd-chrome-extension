@@ -113,7 +113,7 @@ export default function UsersTab({ user }: UsersTabProps) {
                         onClick={() => handleRemoveAccess(c.id, u.id)}
                         className="flex items-center gap-1 px-2 py-1 text-sm text-white bg-red-500 rounded hover:bg-red-600"
                       >
-                        <FiX /> Remove
+                        <FiX />
                       </button>
                     </div>
                   ))

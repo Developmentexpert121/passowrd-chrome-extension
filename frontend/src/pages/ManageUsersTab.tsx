@@ -1,7 +1,7 @@
 import { useState, useEffect, type FormEvent } from "react";
 import {
   signupUser,
-  fetchUsers,
+  fetchAllUsers,
   deleteUser,
   updateUser,
   exportUsers,
@@ -12,13 +12,13 @@ import { BiEdit } from "react-icons/bi";
 import { FaTrash } from "react-icons/fa";
 
 type Role = "super_admin" | "admin" | "user";
-type Team = "designing" | "marketing" | "php" | "fullstack";
+type Team = "designing" | "marketing" | "php" | "fullstack" | "management" | "hr";
 
 interface User {
   id: number;
   email: string;
   role: Role;
-  team: Team;
+  team: string;
 }
 
 interface ApiResponse {
@@ -31,7 +31,7 @@ export default function ManageUsersTab() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState<Role>("user");
-  const [team, setTeam] = useState<Team>("designing");
+  const [team, setTeam] = useState<Team>("management");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -40,7 +40,7 @@ export default function ManageUsersTab() {
   const [editData, setEditData] = useState<{
     email: string;
     role: Role;
-    team: Team;
+    team: string;
     password: string;
   }>({
     email: "",
@@ -50,7 +50,7 @@ export default function ManageUsersTab() {
   });
 
   useEffect(() => {
-    fetchUsers().then((allUsers) => {
+    fetchAllUsers().then((allUsers) => {
       setUsers(allUsers.filter((u: User) => u.role !== "super_admin"));
     });
   }, []);
@@ -71,7 +71,7 @@ export default function ManageUsersTab() {
       if (res.message) {
         setMessage(res.message);
         // Refresh list
-        fetchUsers().then((allUsers) => {
+        fetchAllUsers().then((allUsers) => {
           setUsers(allUsers.filter((u: User) => u.role !== "super_admin"));
         });
         // Clear form only on success
@@ -158,7 +158,7 @@ export default function ManageUsersTab() {
       if (res.message) {
         setMessage(res.message);
         // Refresh list
-        fetchUsers().then((allUsers) => {
+        fetchAllUsers().then((allUsers) => {
           setUsers(allUsers.filter((u: User) => u.role !== "super_admin"));
         });
         setEditingUser(null);
@@ -294,6 +294,7 @@ export default function ManageUsersTab() {
             <option value="php">PHP</option>
             <option value="designing">Designing</option>
             <option value="marketing">Marketing</option>
+            <option value="hr">HR</option>
           </select>
         </div>
         <button

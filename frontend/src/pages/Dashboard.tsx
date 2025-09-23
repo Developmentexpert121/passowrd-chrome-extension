@@ -65,6 +65,10 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
         {activeTab === "users" && <UsersTab user={user} />}
         {activeTab === "manageusers" && <ManageUsersTab />}
       </div>
+      {/* <footer className="flex justify-center mt-2 text-sm text-gray-400 dark:text-gray-300"
+      >
+        Developed by: Gurdeep Singh
+      </footer> */}
     </div>
   );
 }

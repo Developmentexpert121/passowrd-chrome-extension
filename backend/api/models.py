@@ -1,5 +1,17 @@
 from django.db import models
 from django.contrib.auth.hashers import make_password
+import uuid
+from django.utils import timezone
+import json
+
+
+class Team(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    admins = models.TextField(default="[]")  # JSON list of UUIDs
+    members = models.TextField(default="[]")  # JSON list of UUIDs
+
+    def __str__(self):
+        return self.name
 
 
 class AppUser(models.Model):
@@ -9,22 +21,20 @@ class AppUser(models.Model):
         ("user", "User"),
     ]
 
-    TEAM_CHOICES = [
-        ("management", "Management"),
-        ("designing", "Designing"),
-        ("marketing", "Marketing"),
-        ("php", "PHP"),
-        ("fullstack", "Fullstack"),
-    ]
-
     email = models.EmailField(unique=True, blank=False, null=False)
     password = models.CharField(max_length=200, blank=False, null=False)
     role = models.CharField(
         max_length=20, choices=ROLE_CHOICES, blank=False, null=False
     )
-    team = models.CharField(
-        max_length=20, choices=TEAM_CHOICES, blank=False, null=False
-    )
+    team_id = models.UUIDField(blank=True, null=True)
+
+    public_key = models.TextField(blank=True, null=True)  # base64 encoded
+    encrypted_private_key = models.TextField(blank=True, null=True)  # base64 encoded
+    kdf = models.CharField(max_length=50, default="argon2id")
+    kdf_salt = models.TextField(blank=True, null=True)  # base64 encoded
+    kdf_nonce = models.TextField(blank=True, null=True)  # base64 encoded
+
+    devices = models.TextField(default="[]")  # JSON list of device dicts
 
     # ✅ Add these so DRF/Django treats it like an auth user
     @property
@@ -46,21 +56,21 @@ class AppUser(models.Model):
 
 
 class Credential(models.Model):
-    website = models.URLField(blank=True, null=True)
-    email = models.EmailField(blank=False, null=False)
-    password = models.CharField(max_length=200, blank=False, null=False)
+    owner_id = models.UUIDField(default=uuid.uuid4)
+    title = models.CharField(max_length=200, default="")
+    meta = models.TextField(default="{}")  # JSON dict
+    cipher_algo = models.CharField(max_length=50, default="xchacha20-poly1305")
+    ciphertext = models.TextField(default="")  # base64 encoded iv|ct|tag
+
+    acl = models.TextField(default="[]")  # JSON list of dicts
+
+    assigned_to_team_ids = models.TextField(default="[]")  # JSON list of UUIDs
+
+    created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.email} @ {self.website or 'N/A'}"
+        return f"{self.title} owned by {self.owner_id}"
 
 
-class Assignment(models.Model):
-    user = models.ForeignKey(
-        AppUser, on_delete=models.CASCADE, related_name="assignments"
-    )
-    credential = models.ForeignKey(
-        Credential, on_delete=models.CASCADE, related_name="assignments"
-    )
-
-    def __str__(self):
-        return f"{self.user.email} -> {self.credential.email}"
+# Remove Assignment model as ACL handles access control now
