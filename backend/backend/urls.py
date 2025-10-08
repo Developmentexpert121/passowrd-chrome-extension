@@ -16,8 +16,28 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.http import JsonResponse
+
+def home(request):
+    return JsonResponse({
+        'message': 'Password Manager API is running!',
+        'endpoints': {
+            'admin': '/admin/',
+            'api': '/api/',
+            'api_docs': {
+                'login': '/api/login/',
+                'register': '/api/register/',
+                'me': '/api/me/',
+                'token_refresh': '/api/token/refresh/',
+                'credentials': '/api/credentials/',
+                'teams': '/api/teams/',
+                'users': '/api/users/'
+            }
+        }
+    })
 
 urlpatterns = [
+    path('', home, name='home'),
     path('admin/', admin.site.urls),
     path('api/', include('api.urls'))
 ]
