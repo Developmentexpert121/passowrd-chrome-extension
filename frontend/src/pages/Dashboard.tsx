@@ -7,7 +7,12 @@ import ManageUsersTab from "./ManageUsersTab";
 import { clearStorage } from "../utils/api";
 
 interface DashboardProps {
-  user: { id: number; role: "super_admin" | "admin" | "user"; team?: string; email: string };
+  user: {
+    id: number;
+    role: "super_admin" | "admin" | "user";
+    team?: string;
+    email: string;
+  };
   onLogout: () => void;
 }
 
@@ -49,10 +54,11 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
         {tabs.map((t) => (
           <button
             key={t.key}
-            className={`px-3.5 py-2 border-r border-gray-300 last:border-r-0 transition-colors ${activeTab === t.key
-              ? "bg-primary-500 text-white border-b-0"
-              : "bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-800 "
-              }`}
+            className={`px-3.5 py-2 border-r border-gray-300 last:border-r-0 transition-colors ${
+              activeTab === t.key
+                ? "bg-primary-500 text-white border-b-0"
+                : "bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-800 "
+            }`}
             onClick={() => setActiveTab(t.key)}
           >
             {t.label}

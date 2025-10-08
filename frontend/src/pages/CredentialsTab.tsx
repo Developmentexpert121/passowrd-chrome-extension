@@ -27,11 +27,10 @@ import { FaKey } from "react-icons/fa";
 import { IoOpenOutline } from "react-icons/io5";
 
 interface CredentialsTabProps {
-  user: { role: "super_admin" | "admin" | "user", id: number };
+  user: { role: "super_admin" | "admin" | "user"; id: number };
 }
 
 export default function CredentialsTab({ user }: CredentialsTabProps) {
-
   const [creds, setCreds] = useState<
     { id: number; email: string; password: string; website?: string }[]
   >([]);
@@ -64,7 +63,6 @@ export default function CredentialsTab({ user }: CredentialsTabProps) {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
-    console.log("Add credential hit")
     // Prepare payload with required fields for CredentialData
     const payload = {
       owner_id: "", // Should be set to current user id or handled in backend
@@ -80,12 +78,17 @@ export default function CredentialsTab({ user }: CredentialsTabProps) {
       assigned_to_team_ids: formData.assigned_to_team_ids,
     };
 
-    console.log("Add credential Payload", payload)
+    console.log("Add credential Payload", payload);
     await addCredential(payload);
     const newCreds = await fetchCredentials();
     setCreds(newCreds);
     setShowForm(false);
-    setFormData({ email: "", password: "", website: "", assigned_to_team_ids: [] });
+    setFormData({
+      email: "",
+      password: "",
+      website: "",
+      assigned_to_team_ids: [],
+    });
   };
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -147,7 +150,10 @@ export default function CredentialsTab({ user }: CredentialsTabProps) {
 
   const handleRemoveUserAccess = async (userId: number) => {
     if (selectedCredential) {
-      await removeUserAccessFromCredential(selectedCredential, userId.toString());
+      await removeUserAccessFromCredential(
+        selectedCredential,
+        userId.toString()
+      );
       const users = await fetchUsersForCredential(selectedCredential);
       setAssignedUsers(users);
     }
@@ -429,7 +435,8 @@ export default function CredentialsTab({ user }: CredentialsTabProps) {
                           <ul className="space-y-2">
                             {assignedUsers
                               .filter(
-                                (u: any) => user.id !== u.id && u.role !== "super_admin"
+                                (u: any) =>
+                                  user.id !== u.id && u.role !== "super_admin"
                               )
                               .map((u: any) => (
                                 <li

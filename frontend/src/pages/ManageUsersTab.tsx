@@ -67,7 +67,6 @@ export default function ManageUsersTab() {
         role,
         team,
       });
-      console.log("Signup:", res);
       if (res.message) {
         setMessage(res.message);
         // Refresh list

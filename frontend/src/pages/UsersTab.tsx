@@ -36,6 +36,7 @@ export default function UsersTab({ user }: UsersTabProps) {
     [userId: number]: Credential[];
   }>({});
   const [expanded, setExpanded] = useState<{ [userId: number]: boolean }>({});
+  const super_Admin_id = localStorage.getItem("userId") || "";
 
   useEffect(() => {
     fetchUsers().then((allUsers) => {
@@ -46,7 +47,16 @@ export default function UsersTab({ user }: UsersTabProps) {
 
   const fetchCredentials = async (userId: number) => {
     const creds = await fetchCredentialsForUser(userId);
-    setCredentials((prev) => ({ ...prev, [userId]: creds }));
+
+    const filteredCreds = creds.filter((cred: any) =>
+      cred.acl?.some(
+        (aclEntry: any) =>
+          aclEntry.grantee_user_id === String(userId) &&
+          aclEntry.granted_by === super_Admin_id
+      )
+    );
+
+    setCredentials((prev) => ({ ...prev, [userId]: filteredCreds }));
   };
 
   const toggleExpanded = (userId: number) => {

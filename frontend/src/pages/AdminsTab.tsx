@@ -17,19 +17,29 @@ interface AdminsTabProps {
 }
 
 export default function AdminsTab({ user }: AdminsTabProps) {
+  const super_Admin_id = localStorage.getItem("userId") || "";
+
   const [admins, setAdmins] = useState<any[]>([]);
   const [credentials, setCredentials] = useState<{ [userId: number]: any[] }>(
     {}
   );
   const [expanded, setExpanded] = useState<{ [userId: number]: boolean }>({});
-
   useEffect(() => {
     fetchAdmins().then(setAdmins);
   }, []);
 
   const fetchCredentials = async (userId: number) => {
     const creds = await fetchCredentialsForUser(userId);
-    setCredentials((prev) => ({ ...prev, [userId]: creds }));
+
+    const filteredCreds = creds.filter((cred: any) =>
+      cred.acl?.some(
+        (aclEntry: any) =>
+          aclEntry.grantee_user_id === String(userId) &&
+          aclEntry.granted_by === super_Admin_id
+      )
+    );
+
+    setCredentials((prev) => ({ ...prev, [userId]: filteredCreds }));
   };
 
   const toggleExpanded = (userId: number) => {
@@ -62,15 +72,16 @@ export default function AdminsTab({ user }: AdminsTabProps) {
                   Team: {a.team}
                 </p>
               </div>
-              {(user.role === "super_admin" || user.role === "admin") && (
-                <button
-                  onClick={() => toggleExpanded(a.id)}
-                  className="flex items-center gap-1 text-blue-500 cursor-pointer hover:text-blue-600"
-                >
-                  {expanded[a.id] ? <FiChevronUp /> : <FiChevronDown />}
-                  Credentials
-                </button>
-              )}
+              {(user.role === "super_admin" || user.role === "admin") &&
+                a.id && (
+                  <button
+                    onClick={() => toggleExpanded(a.id)}
+                    className="flex items-center gap-1 text-blue-500 cursor-pointer hover:text-blue-600"
+                  >
+                    {expanded[a.id] ? <FiChevronUp /> : <FiChevronDown />}
+                    Credentials
+                  </button>
+                )}
             </div>
             {expanded[a.id] && (
               <div className="mt-3 space-y-2">

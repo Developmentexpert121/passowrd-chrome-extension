@@ -211,6 +211,7 @@ export const fetchWithToken = async <T>(
             ...(options.headers || {}),
           },
         });
+
         if (res.status === 401) {
           // Token expired, try refresh
           const refreshData = await refreshToken();
@@ -226,12 +227,22 @@ export const fetchWithToken = async <T>(
             });
           }
         }
-        const data = await res.json();
+
+        // 🛡️ Handle empty or non-JSON responses safely
+        const text = await res.text();
+        let data: any = {};
+        try {
+          data = text ? JSON.parse(text) : {};
+        } catch (err) {
+          console.warn("Failed to parse JSON:", err, "Raw response:", text);
+        }
+
         resolve(data as T);
       }
     );
   });
 };
+
 
 // ---------------- API CALLS ----------------
 export const fetchCredentials = async () => {
