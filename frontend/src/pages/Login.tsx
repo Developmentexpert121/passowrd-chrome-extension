@@ -36,16 +36,18 @@ export default function Login({ onLogin }: LoginProps) {
   };
 
   return (
-    <div className="bg-gray-900 shadow-md p-4 rounded-md w-72 text-white">
-      <h3 className="mb-4 font-semibold text-xl">Login</h3>
-      <form onSubmit={handleSubmit} className="flex flex-col space-y-3">
+    <div className="bg-white shadow p-3 rounded w-60 border border-gray-200">
+      <h3 className="mb-3 font-semibold text-lg text-gray-900 text-center">
+        Login
+      </h3>
+      <form onSubmit={handleSubmit} className="flex flex-col space-y-2">
         <input
           type="email"
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          className="bg-gray-800 px-3 py-2 border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          className="bg-gray-50 px-2 py-1.5 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 text-gray-900 placeholder-gray-500 text-xs"
         />
         <input
           type="password"
@@ -53,15 +55,15 @@ export default function Login({ onLogin }: LoginProps) {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
-          className="bg-gray-800 px-3 py-2 border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          className="bg-gray-50 px-2 py-1.5 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 text-gray-900 placeholder-gray-500 text-xs"
         />
         <button
           type="submit"
-          className="bg-indigo-600 hover:bg-indigo-700 py-2 rounded-md w-full font-semibold transition-colors"
+          className="bg-blue-600 hover:bg-blue-700 py-1.5 rounded w-full font-semibold text-white transition-colors text-xs"
         >
           Login
         </button>
-        {error && <p className="text-red-500">{error}</p>}
+        {error && <p className="text-red-600 text-xs text-center">{error}</p>}
       </form>
     </div>
   );
