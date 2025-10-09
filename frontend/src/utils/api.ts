@@ -1,6 +1,6 @@
 import sodium from 'libsodium-wrappers';
 
-const BASE_URL = "http://127.0.0.1:8000/api";
+const BASE_URL = "https://passowrd-chrome-extension.onrender.com/api";
 
 // ---------------- TYPES ----------------
 export interface LoginResponse {

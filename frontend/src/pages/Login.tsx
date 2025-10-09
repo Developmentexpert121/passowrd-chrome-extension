@@ -19,12 +19,15 @@ export default function Login({ onLogin }: LoginProps) {
     const data: LoginResponse = await loginUser(email, password);
     if (data.access) {
       // Fetch full user info including email after login
-      const userInfoResponse = await fetch("http://127.0.0.1:8000/api/me/", {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${data.access}`,
-        },
-      });
+      const userInfoResponse = await fetch(
+        "https://passowrd-chrome-extension.onrender.com/api/me/",
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${data.access}`,
+          },
+        }
+      );
       const userInfo = await userInfoResponse.json();
       onLogin({ id: data.id, role: data.role, email: userInfo.email });
     } else {
