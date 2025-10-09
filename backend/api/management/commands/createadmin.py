@@ -11,7 +11,7 @@ class Command(BaseCommand):
         username = os.environ.get('ADMIN_USERNAME', 'prince')
         email = os.environ.get('ADMIN_EMAIL', 'prince@devexhub.in')
         password = os.environ.get('ADMIN_PASSWORD', 'Admin@123')
-        
+        print(f'Superuser {username} created.')
         # Check if user exists
         if User.objects.filter(username=username).exists():
             self.stdout.write(
