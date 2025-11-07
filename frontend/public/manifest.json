@@ -6,12 +6,29 @@
     "default_popup": "index.html",
     "default_title": "Open Popup"
   },
-  "permissions": ["storage", "activeTab", "scripting", "tabs", "identity"],
-  "host_permissions": ["http://127.0.0.1:8000/*"],
+  "permissions": [
+    "storage",
+    "activeTab",
+    "scripting",
+    "tabs",
+    "identity"
+  ],
+  "host_permissions": [
+    "http://127.0.0.1:8000/*",
+    "<all_urls>"
+  ],
   "content_scripts": [
     {
-      "matches": ["<all_urls>"],
-      "js": ["content.js"]
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "run_at": "document_start"
     }
-  ]
+  ],
+  "background": {
+    "service_worker": "background.js"
+  }
 }

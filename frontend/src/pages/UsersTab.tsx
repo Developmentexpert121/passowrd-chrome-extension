@@ -71,6 +71,8 @@ export default function UsersTab({ user }: UsersTabProps) {
     // Refresh credentials
     fetchCredentials(userId);
   };
+  console.log(users);
+  console.log(credentials);
 
   return (
     <div className="space-y-2 text-gray-800 dark:text-gray-50">

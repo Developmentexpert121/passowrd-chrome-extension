@@ -269,6 +269,9 @@ export const fetchCredentials = async () => {
 
         // Find the acl entry for userId
         const aclEntry = cred.acl.find((entry: any) => entry.grantee_user_id === userId);
+        console.log({ userId });
+        console.log({ aclEntry });
+
         if (aclEntry) {
           console.log("Found ACL entry for user:", userId);
           console.log("ACL entry:", {
@@ -310,6 +313,8 @@ export const fetchCredentials = async () => {
             // Continue to next credential instead of failing completely
             continue;
           }
+        } else {
+          return []
         }
       }
     }

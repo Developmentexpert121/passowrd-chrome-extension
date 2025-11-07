@@ -3,25 +3,26 @@
 @tailwind utilities;
 
 @theme {
-  --color-primary-50: #fef2f2;
-  --color-primary-100: #fee2e2;
-  --color-primary-200: #fecaca;
-  --color-primary-300: #fca5a5;
-  --color-primary-400: #f87171;
-  --color-primary-500: #ef4444;
-  --color-primary-600: #dc2626;
-  --color-primary-700: #b91c1c;
-  --color-primary-800: #991b1b;
-  --color-primary-900: #7f1d1d;
+  --color-primary-50: #fdf6f9;
+  --color-primary-100: #fbe9f2;
+  --color-primary-200: #f8d7e9;
+  --color-primary-300: #f3b8d3;
+  --color-primary-400: #ec94ba;
+  --color-primary-500: #e678a8;
+  --color-primary-600: #d45f91;
+  --color-primary-700: #b84d7e;
+  --color-primary-800: #933a64;
+  --color-primary-900: #6b2b4b;
 
-  --color-gray-50: #f9fafb;
-  --color-gray-100: #f3f4f6;
-  --color-gray-200: #e5e7eb;
-  --color-gray-300: #d1d5db;
-  --color-gray-400: #9ca3af;
-  --color-gray-500: #6b7280;
-  --color-gray-600: #4b5563;
-  --color-gray-700: #374151;
-  --color-gray-800: #1f2937;
-  --color-gray-900: #111827;
+  /* 🌤️ Gray – Warm Neutral Pastel (Good for backgrounds/text) */
+  --color-gray-50: #fdfcfb;
+  --color-gray-100: #f8f7f6;
+  --color-gray-200: #f0eeec;
+  --color-gray-300: #e4e1df;
+  --color-gray-400: #c8c5c3;
+  --color-gray-500: #a6a3a1;
+  --color-gray-600: #7f7d7b;
+  --color-gray-700: #5f5d5b;
+  --color-gray-800: #3e3c3b;
+  --color-gray-900: #262524;
 }
